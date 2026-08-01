@@ -198,4 +198,4 @@ harbor run -p ./tasks/nginx-log-fix -a claude-code -m claude-3-5-sonnet-20241022
 
 # Congratulations!
 
-You have successfully created and executed your first Harbor demo task.
+You have successfully created and executed your first Harbor demo task, for more details, read `EXPLANATION.md`.

@@ -702,6 +702,22 @@ The task is now in its expected final state:
 - `tests/test.sh` checks the important valid, invalid, duplicate, malformed, and multi-error scenarios.
 - Oracle passes the strengthened verifier with a reward of `1.0`.
 
+### Note
+If the model fails, you can run the below command and inspect the solution that was generated.
+
+```bash
+harbor view jobs
+```
+
+Then navigate the web server via the link provided, example:
+
+```bash
+Starting Harbor Viewer
+  Jobs folder: /Users/me/harbor-agent-tasks/jobs
+  Mode: jobs
+  Server: http://127.0.0.1:8082
+```
+
 ## Conclusion
 
 This task demonstrates the complete benchmark-development cycle:

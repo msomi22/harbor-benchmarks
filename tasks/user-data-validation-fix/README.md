@@ -683,6 +683,17 @@ The final Oracle run is expected to receive:
 1.0
 ```
 
+Run the task again using an AI agent and model:
+
+```bash
+harbor run \
+  -p ./tasks/user-validation-gap \
+  -a gemini-cli \
+  -m google/gemini-3.5-flash-lite \
+  --ae GEMINI_API_KEY="$GEMINI_API_KEY" \
+  --n-attempts 5
+```
+
 The task is now in its expected final state:
 
 - `instruction.md` defines clear and complete requirements.

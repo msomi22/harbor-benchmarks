@@ -48,17 +48,15 @@ Replace or populate the generated files with the exact contents below:
 *Configures metadata, container timeouts, and environment parameters for Harbor.*
 
 ```toml
-version = "1.0"
+schema_version = "1.3"
+artifacts = []
 
 [task]
-name = "nginx-log-fix"
-author = "msomi22"
+name = "local/nginx-log-fix"
 description = "Fix a broken Python script parsing malformed Nginx logs into JSON metrics."
+authors = [{ name = "Peter Mwenda" }]
+keywords = []
 category = "sysadmin"
-
-[environment]
-dockerfile = "environment/Dockerfile"
-timeout_seconds = 300
 
 ```
 

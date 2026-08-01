@@ -339,7 +339,7 @@ The Oracle run is expected to receive a reward of `1.0`, even though `solution/s
 Run the task using an AI agent and model:
 
 ```bash
-harbor run -p ./tasks/user-validation-gap -a claude-code -m claude-3-5-sonnet-20241022
+harbor run -p ./tasks/user-validation-gap -a codex -m openai/gpt-5-mini
 ```
 
 An AI agent may implement the requirement correctly, but it may also make the same raw-string duplicate comparison as the reference solution. The incomplete verifier cannot distinguish between those implementations.

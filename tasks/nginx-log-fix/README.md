@@ -8,7 +8,7 @@ This task tests an AI agent's ability to debug a failing Python script, handle m
 
 To keep the task organized, we will create the following folder structure inside our repository:
 For this task, only create folder `harbor-agent-tasks` and inside create another folder `tasks`.
-We will execute the next steps inside this folder 'tasks'. The final layout at the end will look as follows.
+We will execute the next steps inside this folder `tasks`. The final layout at the end will look as follows.
 
 ```text
 harbor-agent-tasks/

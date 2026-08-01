@@ -75,3 +75,17 @@ Sample output
 ## Step 4: Run Your First Demo Task (`nginx-log-fix`)
 
 Navigate to the repo `tasks/nginx-log-fix`
+
+Depending on the model you are using, you may need the api key...
+
+For OpenAI, use below
+
+```bash
+export OPENAI_API_KEY="<paste-your-key-here>"
+```
+
+Or if using Anthropic, use below.
+
+```bash
+export ANTHROPIC_API_KEY="<your-anthropic-api-key>"
+```

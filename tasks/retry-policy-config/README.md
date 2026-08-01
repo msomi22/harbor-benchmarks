@@ -551,8 +551,9 @@ Run five attempts:
 ```bash
 harbor run \
   -p ./tasks/retry-policy-config \
-  --agent codex \
-  --model openai/gpt-5-mini \
+  -a gemini-cli \
+  -m google/gemini-3.5-flash-lite \
+  --ae GEMINI_API_KEY="$GEMINI_API_KEY" \
   --n-attempts 4
 ```
 

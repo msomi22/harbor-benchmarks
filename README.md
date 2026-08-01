@@ -2,7 +2,7 @@
 
 Custom evaluation benchmarks and containerized test tasks built for Harbor.
 
-We assume you are using a MacBook or Linux-related OS.
+I assume you are using a MacBook or Linux-related OS.
 
 To get started, follow the steps below to set up your environment and run your first test task.
 

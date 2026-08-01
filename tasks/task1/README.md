@@ -210,9 +210,16 @@ fi
 
 Before testing an AI agent, verify your reference solution scores `1.0`:
 
+From the directory that has tasks ... execute the following 
+
 ```bash
 harbor run -p ./tasks/nginx-log-fix -a oracle
 
+```
+
+To debug
+```bash
+harbor trials start -p ./tasks/nginx-log-fix -a oracle
 ```
 
 ### 2. Run against an AI Agent

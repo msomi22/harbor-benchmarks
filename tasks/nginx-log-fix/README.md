@@ -1,4 +1,5 @@
 # Task 1: Nginx Log Processing Script (`nginx-log-fix`)
+### Note: this is demo test to help learners get started quickly 
 
 This task tests an AI agent's ability to debug a failing Python script, handle malformed input logs using regex, and output formatted JSON results in a sandboxed Docker container.
 
@@ -218,7 +219,32 @@ harbor run -p ./tasks/nginx-log-fix -a oracle
 
 ```
 
-To debug
+### Sample output
+
+```bash
+  1/1 Mean: 1.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:00:24 0:00:00
+
+adhoc • oracle
+┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┓
+┃ Trials ┃ Exceptions ┃  Mean ┃
+┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━┩
+│      1 │          0 │ 1.000 │
+└────────┴────────────┴───────┘
+
+┏━━━━━━━━┳━━━━━━━┓
+┃ Reward ┃ Count ┃
+┡━━━━━━━━╇━━━━━━━┩
+│ 1.0    │     1 │
+└────────┴───────┘
+
+Job Info
+Total runtime: 24s
+Results written to jobs/2026-08-01__16-09-43/result.json
+Inspect results by running `harbor view jobs`
+Share results by running `harbor upload jobs/2026-08-01__16-09-43`
+```
+
+### To debug
 ```bash
 harbor trials start -p ./tasks/nginx-log-fix -a oracle
 ```
@@ -235,3 +261,36 @@ harbor run -p ./tasks/nginx-log-fix -a <agent-name> -m <model-name>
 ```bash
 harbor run -p ./tasks/nginx-log-fix -a claude-code -m claude-3-5-sonnet-20241022
 ```
+#### Sample result
+
+```bash
+  1/1 Mean: 0.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:04:18 0:00:00
+
+adhoc • claude-code • claude-3-5-sonnet-20241022
+┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┓
+┃ Trials ┃ Exceptions ┃  Mean ┃
+┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━┩
+│      1 │          1 │ 0.000 │
+└────────┴────────────┴───────┘
+
+┏━━━━━━━━┳━━━━━━━┓
+┃ Reward ┃ Count ┃
+┡━━━━━━━━╇━━━━━━━┩
+│ 0.0    │     1 │
+└────────┴───────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┓
+┃ Exception                ┃ Count ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━┩
+│ AgentAuthenticationError │     1 │
+└──────────────────────────┴───────┘
+
+Job Info
+Total runtime: 4m 18s
+Results written to jobs/2026-08-01__16-13-28/result.json
+Inspect results by running `harbor view jobs`
+Share results by running `harbor upload jobs/2026-08-01__16-13-28`
+```
+
+# Congratulations! you have completed your first demo task.
+

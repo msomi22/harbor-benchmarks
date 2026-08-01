@@ -84,6 +84,12 @@ For OpenAI, use below
 export OPENAI_API_KEY="<paste-your-key-here>"
 ```
 
+Google's Gemini
+
+```bash
+export GEMINI_API_KEY="<your-gemini-api-key>"
+```
+
 Or if using Anthropic, use below.
 
 ```bash

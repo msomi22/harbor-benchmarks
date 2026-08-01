@@ -228,3 +228,7 @@ Run the benchmark against your chosen agent and model:
 harbor run -p ./tasks/nginx-log-fix -a <agent-name> -m <model-name>
 
 ```
+### Example
+```bash
+harbor run -p ./tasks/nginx-log-fix -a claude-code -m claude-3-5-sonnet-20241022
+```

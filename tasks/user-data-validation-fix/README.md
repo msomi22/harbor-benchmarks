@@ -339,7 +339,12 @@ The Oracle run is expected to receive a reward of `1.0`, even though `solution/s
 Run the task using an AI agent and model:
 
 ```bash
-harbor run -p ./tasks/user-validation-gap -a codex -m openai/gpt-5-mini
+harbor run \
+  -p ./tasks/user-validation-gap \
+  -a gemini-cli \
+  -m google/gemini-3.5-flash-lite \
+  --ae GEMINI_API_KEY="$GEMINI_API_KEY" \
+  --n-attempts 5
 ```
 
 An AI agent may implement the requirement correctly, but it may also make the same raw-string duplicate comparison as the reference solution. The incomplete verifier cannot distinguish between those implementations.

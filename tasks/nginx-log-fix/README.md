@@ -1,16 +1,9 @@
 # Task 1: Nginx Log Processing Script (`nginx-log-fix`)
-### Note: this is demo test to help learners get started quickly 
 
-This task tests an AI agent's ability to debug a failing Python script, handle malformed input logs using regex, and output formatted JSON results in a sandboxed Docker container.
+> **Note**
+> This is a demo task to help learners get started with Harbor. It is intentionally simple.
 
----
-
-## 📁 Repository & Directory Layout
-
-To keep the task organized, we will create the following folder structure inside our repository:
-For this task, only create folder `harbor-agent-tasks` and inside create another folder `tasks`.
-We will execute the next steps inside this folder `tasks`. The final layout at the end of the steps will look as follows.
-Please jump to `step 1` and folow all through to `step 3`.
+## Repository Layout
 
 ```text
 harbor-agent-tasks/
@@ -24,32 +17,23 @@ harbor-agent-tasks/
         │   └── solve.sh
         └── tests/
             └── test.sh
-
 ```
 
----
-
-## 🛠️ Step 1: Scaffold Quick Commands
-
-If you want to generate the initial directory structure automatically using Harbor, run:
+## Step 1: Scaffold the Task
 
 ```bash
-mkdir -p tasks && cd tasks
-harbor init nginx-log-fix
-# Select 't' when prompted for task creation
-cd nginx-log-fix
+mkdir -p harbor-agent-tasks/tasks
+cd harbor-agent-tasks/tasks
 
+harbor init nginx-log-fix
+# Select 't' when prompted to create a task.
+
+cd nginx-log-fix
 ```
 
----
+## Step 2: Replace the Generated Files
 
-## 📄 Step 2: Task Files Content
-
-Replace or populate the generated files with the exact contents below:
-
-### 1. `task.toml`
-
-*Configures metadata, container timeouts, and environment parameters for Harbor.*
+### `task.toml`
 
 ```toml
 schema_version = "1.3"
@@ -61,26 +45,31 @@ description = "Fix a broken Python script parsing malformed Nginx logs into JSON
 authors = [{ name = "Peter Mwenda" }]
 keywords = []
 category = "sysadmin"
-
 ```
 
----
+### `instruction.md`
 
-### 2. `instruction.md`
-
-*This is the **only text prompt** provided to the AI agent inside the container environment.*
-
-```markdown
+````markdown
 # Problem Statement
 
-There is an existing Python script at `/app/parse_logs.py` intended to parse Nginx access log lines from `/var/log/nginx/access.log`.
+There is an existing Python script at `/app/parse_logs.py` intended to parse Nginx access logs from `/var/log/nginx/access.log`.
 
-Currently, running `python3 /app/parse_logs.py` fails when encountering non-standard or malformed log lines.
+Running:
 
-### Requirements:
-1. Fix `/app/parse_logs.py` so that it safely parses all lines in `/var/log/nginx/access.log`.
-2. Extract and aggregate HTTP status code families (`2xx`, `4xx`, and `5xx`).
-3. Save the final aggregated counts into `/app/metrics.json` using the following exact structure:
+```bash
+python3 /app/parse_logs.py
+```
+
+currently fails when malformed log entries are encountered.
+
+## Requirements
+
+1. Fix `/app/parse_logs.py` so it safely parses every line in `/var/log/nginx/access.log`.
+2. Ignore malformed lines that do not contain a valid HTTP status code.
+3. Aggregate HTTP status code families (`2xx`, `4xx`, and `5xx`).
+4. Write the aggregated counts to `/app/metrics.json`.
+
+Expected output:
 
 ```json
 {
@@ -89,208 +78,128 @@ Currently, running `python3 /app/parse_logs.py` fails when encountering non-stan
   "5xx": 1
 }
 ```
+````
 
----
-
-### 3. `environment/Dockerfile`
-*Defines the initial container state (including the buggy log file and incomplete script).*
+### `environment/Dockerfile`
 
 ```dockerfile
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# 1. Create directory structure
 RUN mkdir -p /var/log/nginx /app
 
-# 2. Add test access log containing standard lines and one malformed line
 RUN echo '192.168.1.1 - - [01/Aug/2026:10:00:00 +0000] "GET /api HTTP/1.1" 200 123' > /var/log/nginx/access.log && \
     echo '192.168.1.2 - - [01/Aug/2026:10:01:00 +0000] "POST /login HTTP/1.1" 404 45' >> /var/log/nginx/access.log && \
     echo '192.168.1.3 - - MALFORMED LINE EXTRA SPACES 500' >> /var/log/nginx/access.log
 
-# 3. Create the initial broken script that crashes on malformed input
 RUN cat << 'EOF' > /app/parse_logs.py
 import json
 
 metrics = {"2xx": 0, "4xx": 0, "5xx": 0}
 
-with open("/var/log/nginx/access.log", "r") as f:
+with open("/var/log/nginx/access.log") as f:
     for line in f:
-        # Rigid split that crashes on unexpected formats
         parts = line.split(" ")
-        status = parts[8]  
-        if status.startswith("2"): metrics["2xx"] += 1
-        elif status.startswith("4"): metrics["4xx"] += 1
-        elif status.startswith("5"): metrics["5xx"] += 1
+        status = parts[8]
+        if status.startswith("2"):
+            metrics["2xx"] += 1
+        elif status.startswith("4"):
+            metrics["4xx"] += 1
+        elif status.startswith("5"):
+            metrics["5xx"] += 1
 
 with open("/app/metrics.json", "w") as out:
     json.dump(metrics, out)
 EOF
 
 CMD ["bash"]
-
 ```
 
----
-
-### 4. `solution/solve.sh`
-
-*The ground-truth reference solution used to verify that the task can score `1.0`.*
+### `solution/solve.sh`
 
 ```bash
 #!/bin/bash
 set -e
 
-# Overwrite /app/parse_logs.py with a resilient regex parser solution
 cat << 'EOF' > /app/parse_logs.py
 import re
 import json
 
 metrics = {"2xx": 0, "4xx": 0, "5xx": 0}
 
-with open("/var/log/nginx/access.log", "r") as f:
+with open("/var/log/nginx/access.log") as f:
     for line in f:
-        # Use regex to find 3-digit status codes (2xx, 4xx, 5xx) anywhere in the line
-        match = re.search(r'\b([245]\d\d)\b', line)
+        match = re.search(r"\b([245]\d\d)\b", line)
         if match:
             code = match.group(1)
-            if code.startswith("2"):
-                metrics["2xx"] += 1
-            elif code.startswith("4"):
-                metrics["4xx"] += 1
-            elif code.startswith("5"):
-                metrics["5xx"] += 1
+            metrics[f"{code[0]}xx"] += 1
 
 with open("/app/metrics.json", "w") as out:
     json.dump(metrics, out, indent=2)
 EOF
 
-# Execute the script
 python3 /app/parse_logs.py
-
 ```
 
----
-
-### 5. `tests/test.sh`
-
-*The test harness run by Harbor after the agent finishes. Scores `1.0` for success or `0.0` for failure.*
+### `tests/test.sh`
 
 ```bash
 #!/bin/bash
 
-# Ensure output directory for harbor evaluation logger exists
 mkdir -p /logs/verifier
 
-# 1. Run the python script
-python3 /app/parse_logs.py 2>/dev/null
+python3 /app/parse_logs.py >/dev/null 2>&1
 
-# 2. Assert that metrics.json exists
-if [ ! -f "/app/metrics.json" ]; then
-    echo "0.0" > /logs/verifier/reward.txt
-    exit 0
-fi
+python3 <<'EOF'
+import json, sys
+expected={"2xx":1,"4xx":1,"5xx":1}
+try:
+    actual=json.load(open("/app/metrics.json"))
+except Exception:
+    sys.exit(1)
+sys.exit(0 if actual==expected else 1)
+EOF
 
-# 3. Assert correct output contents
-HAS_2XX=$(grep -q '"2xx": 1' /app/metrics.json && echo 1 || echo 0)
-HAS_4XX=$(grep -q '"4xx": 1' /app/metrics.json && echo 1 || echo 0)
-HAS_5XX=$(grep -q '"5xx": 1' /app/metrics.json && echo 1 || echo 0)
-
-if [ "$HAS_2XX" -eq 1 ] && [ "$HAS_4XX" -eq 1 ] && [ "$HAS_5XX" -eq 1 ]; then
-    echo "1.0" > /logs/verifier/reward.txt
+if [ $? -eq 0 ]; then
+  echo "1.0" > /logs/verifier/reward.txt
 else
-    echo "0.0" > /logs/verifier/reward.txt
+  echo "0.0" > /logs/verifier/reward.txt
 fi
-
 ```
 
----
+## Step 3: Run the Task
 
-## 🚀 Step 3: Running & Testing the Task
+Return to the project root, the folder named `harbor-agent-tasks`:
 
-### 1. Test your reference solution first (Sanity Check)
+```bash
+cd ../../
+```
 
-Before testing an AI agent, verify your reference solution scores `1.0`:
-
-From the directory that has tasks ... execute the following 
+Verify the reference solution:
 
 ```bash
 harbor run -p ./tasks/nginx-log-fix -a oracle
-
 ```
 
-### Sample output
+Debug:
 
-```bash
-  1/1 Mean: 1.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:00:24 0:00:00
-
-adhoc • oracle
-┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┓
-┃ Trials ┃ Exceptions ┃  Mean ┃
-┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━┩
-│      1 │          0 │ 1.000 │
-└────────┴────────────┴───────┘
-
-┏━━━━━━━━┳━━━━━━━┓
-┃ Reward ┃ Count ┃
-┡━━━━━━━━╇━━━━━━━┩
-│ 1.0    │     1 │
-└────────┴───────┘
-
-Job Info
-Total runtime: 24s
-Results written to jobs/2026-08-01__16-09-43/result.json
-Inspect results by running `harbor view jobs`
-Share results by running `harbor upload jobs/2026-08-01__16-09-43`
-```
-
-### To debug
 ```bash
 harbor trials start -p ./tasks/nginx-log-fix -a oracle
 ```
 
-### 2. Run against an AI Agent
-
-Run the benchmark against your chosen agent and model:
+Run against an AI agent:
 
 ```bash
 harbor run -p ./tasks/nginx-log-fix -a <agent-name> -m <model-name>
-
 ```
-### Example
+
+Example:
+
 ```bash
 harbor run -p ./tasks/nginx-log-fix -a claude-code -m claude-3-5-sonnet-20241022
 ```
-#### Sample result
 
-```bash
-  1/1 Mean: 0.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:04:18 0:00:00
+# Congratulations!
 
-adhoc • claude-code • claude-3-5-sonnet-20241022
-┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┓
-┃ Trials ┃ Exceptions ┃  Mean ┃
-┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━┩
-│      1 │          1 │ 0.000 │
-└────────┴────────────┴───────┘
-
-┏━━━━━━━━┳━━━━━━━┓
-┃ Reward ┃ Count ┃
-┡━━━━━━━━╇━━━━━━━┩
-│ 0.0    │     1 │
-└────────┴───────┘
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┓
-┃ Exception                ┃ Count ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━┩
-│ AgentAuthenticationError │     1 │
-└──────────────────────────┴───────┘
-
-Job Info
-Total runtime: 4m 18s
-Results written to jobs/2026-08-01__16-13-28/result.json
-Inspect results by running `harbor view jobs`
-Share results by running `harbor upload jobs/2026-08-01__16-13-28`
-```
-
-# Congratulations! you have completed your first demo task.
-
+You have successfully created and executed your first Harbor demo task.

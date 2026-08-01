@@ -27,6 +27,8 @@ cd harbor-agent-tasks/tasks
 
 harbor init nginx-log-fix
 # Select 't' when prompted to create a task.
+# Enter any organization name when prompted
+# Organization: demo
 
 cd nginx-log-fix
 ```

@@ -44,20 +44,37 @@ keywords = []
 category = "sysadmin"
 ```
 
-`task.toml` identifies and describes the task to Harbor. It is the task's configuration and metadata file.
+`task.toml` is the task manifest that Harbor reads when loading the task. It contains both operational configuration and descriptive metadata.
 
-| Setting | Purpose |
-| --- | --- |
-| `schema_version = "1.3"` | Specifies the Harbor task-definition format used by this file. |
-| `artifacts = []` | Declares additional output artifacts that Harbor should collect. This task declares none. |
-| `[task]` | Begins the main task metadata section. |
-| `name` | Provides the task's unique name. The `local/` prefix identifies it as a locally defined task. |
-| `description` | Summarizes the problem the agent must solve. |
-| `authors` | Records the task author. |
-| `keywords` | Provides optional search or classification terms. It is empty in this demo. |
-| `category` | Classifies the task as a system-administration task. |
+Some settings can affect whether Harbor can load and run the task. Other settings primarily affect how the task is identified, documented, searched, or categorized.
 
-`task.toml` does not execute the Python script or grade the solution. It tells Harbor what the task is and how it should be identified.
+| Setting | Purpose | What happens if it is wrong? |
+| --- | --- | --- |
+| `schema_version = "1.3"` | Specifies the Harbor task-definition format used by the file. | An unsupported or incorrect version may cause Harbor to reject the task or interpret its configuration incorrectly. This can prevent both Oracle and AI-agent evaluations from starting. |
+| `artifacts = []` | Declares additional files or outputs that Harbor should collect after the run. This task declares none. | An invalid artifacts configuration may cause Harbor to reject the task or fail to collect expected outputs. An empty list is correct here because scoring uses `/logs/verifier/reward.txt`, which is handled by the verifier. |
+| `[task]` | Begins the main task metadata section. | If this section is missing or malformed, Harbor may fail to load the task because the following task fields would not be defined in the expected location. |
+| `name` | Provides the task's identifying name. The `local/` prefix indicates that it is a locally defined task. | A missing, invalid, or conflicting name may prevent Harbor from identifying the task correctly. An inaccurate but accepted name may not change the solution or score, but it can make results difficult to identify or compare. |
+| `description` | Provides a short summary of the problem. | An inaccurate description may make the task misleading, but it does not directly change the broken script, reference solution, or verifier. The detailed requirements are defined in `instruction.md`. |
+| `authors` | Records the task author or authors. | An incorrect author does not normally affect task execution or scoring, but it gives incorrect ownership or attribution information. An invalid value type may cause configuration validation to fail. |
+| `keywords` | Provides optional terms for searching, filtering, or classifying the task. It is empty in this demo. | Incorrect keywords normally do not affect execution or scoring, but they can make the task harder to find or incorrectly grouped. An invalid value type may cause validation to fail. |
+| `category` | Classifies the task by subject area. This task uses `sysadmin`. | An inaccurate category normally does not affect the task solution or score, but it can cause the task and its results to be grouped incorrectly. An invalid value may be rejected if Harbor validates allowed categories. |
+
+### What a Wrong `task.toml` Can Affect
+
+A structurally invalid `task.toml` can affect Harbor itself. Examples include invalid TOML syntax, an unsupported schema version, missing required sections, or fields containing the wrong data types.
+
+Depending on the error, Harbor may:
+
+- Reject the task before starting it.
+- Fail to build or start the task environment.
+- Fail to start the Oracle or AI-agent run.
+- Misidentify or misconfigure the task.
+- Fail to collect declared artifacts.
+- Produce incomplete or unreliable evaluation results.
+
+If Harbor cannot load or configure the task correctly, the AI model is not being evaluated fairly. A failed result may reflect a broken task definition rather than the model's ability to solve the problem.
+
+Harbor must successfully read and validate `task.toml` before it can coordinate the rest of the task. A structurally correct manifest is therefore necessary for a valid and reliable evaluation.
 
 ## 2. `instruction.md`: Instructions Given to the Agent
 

@@ -551,8 +551,8 @@ Run five attempts:
 ```bash
 harbor run \
   -p ./tasks/retry-policy-config \
-  --agent claude-code \
-  --model claude-opus-4-8 \
+  --agent codex \
+  --model openai/gpt-5-mini \
   --n-attempts 4
 ```
 

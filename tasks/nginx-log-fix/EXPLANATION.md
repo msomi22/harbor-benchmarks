@@ -316,11 +316,27 @@ Both the Oracle flow and the AI-agent flow are evaluated using the same `tests/t
 
 ## Responsibility Summary
 
-| File | Responsibility |
-| --- | --- |
-| `task.toml` | Identifies and describes the Harbor task. |
-| `instruction.md` | Defines the problem and expected result for the agent. |
-| `environment/Dockerfile` | Builds the isolated environment containing the logs and broken script. |
-| `solution/solve.sh` | Supplies the benchmark author's known-good reference solution. |
-| `tests/test.sh` | Verifies the output and assigns the task reward. |
+The benchmark developer is responsible for ensuring that all task files are accurate, consistent, and properly tested.
 
+| File | Developer’s responsibility |
+| --- | --- |
+| `task.toml` | Provide valid Harbor configuration and accurate task metadata. |
+| `instruction.md` | Define clear, complete, and unambiguous requirements for the AI agent. |
+| `environment/Dockerfile` | Build a reproducible environment containing the intended problem and required dependencies. |
+| `solution/solve.sh` | Provide a known-good reference solution that satisfies all requirements. |
+| `tests/test.sh` | Verify every important requirement and reject incorrect or incomplete solutions. |
+
+The quality of the evaluation depends on the quality of these files. If the developer provides unclear instructions, an unrealistic environment, an incorrect reference solution, or weak tests, Harbor may produce misleading results. An AI agent could fail because the task is badly designed, or an incorrect solution could pass because the verifier is incomplete.
+
+The developer should therefore confirm that:
+
+- The original broken implementation fails.
+- The Oracle reference solution passes with a reward of `1.0`.
+- Intentionally incorrect solutions fail.
+- Alternative valid solutions pass.
+- Every requirement in `instruction.md` is checked by `tests/test.sh`.
+- Repeated runs produce consistent results.
+
+An Oracle score of `1.0` confirms only that `solution/solve.sh` passes `tests/test.sh`; it does not prove that the instructions and tests are complete or accurate.
+
+In short, a Harbor task is only as reliable as its design: poor task definitions produce poor or misleading evaluations, commonly described as **“garbage in, garbage out.”**

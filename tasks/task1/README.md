@@ -211,7 +211,7 @@ fi
 Before testing an AI agent, verify your reference solution scores `1.0`:
 
 ```bash
-harbor solve -p ./tasks/nginx-log-fix
+harbor run -p ./tasks/nginx-log-fix -a oracle
 
 ```
 

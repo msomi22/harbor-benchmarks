@@ -184,12 +184,6 @@ Verify the reference solution:
 harbor run -p ./tasks/nginx-log-fix -a oracle
 ```
 
-Debug:
-
-```bash
-harbor trials start -p ./tasks/nginx-log-fix -a oracle
-```
-
 Run against an AI agent:
 
 ```bash
